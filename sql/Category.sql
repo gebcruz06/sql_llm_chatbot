@@ -1,25 +1,10 @@
-IF OBJECT_ID('dev.dbo.Product', 'U') IS NOT NULL DROP TABLE dev.dbo.Product;
-CREATE TABLE dev.dbo.Product (
-    ProductID INT IDENTITY(1,1) PRIMARY KEY,
-    ProductCode NVARCHAR(50) NOT NULL UNIQUE,
-    ProductName NVARCHAR(255),
-    CategoryID INT NULL FOREIGN KEY REFERENCES dev.dbo.Category(CategoryID)
+IF OBJECT_ID('dev.dbo.Category', 'U') IS NOT NULL DROP TABLE dev.dbo.Category;
+CREATE TABLE dev.dbo.Category (
+    CategoryID INT IDENTITY(1,1) PRIMARY KEY,
+    Level1Category NVARCHAR(255) NOT NULL UNIQUE
 );
 
-WITH RankedProducts AS (
-  SELECT
-    Product AS ProductCode,
-    ProductName,
-    c.CategoryID,
-    ROW_NUMBER() OVER (PARTITION BY Product, c.CategoryID ORDER BY LEN(ProductName) DESC) as rn
-  FROM dev.stg.RawOrder s
-  LEFT JOIN dev.dbo.Category c
-    ON s.Level1Category = c.Level1Category
-)
-INSERT INTO dev.dbo.Product (ProductCode, ProductName, CategoryID)
-SELECT DISTINCT
-  ProductCode,
-  ProductName,
-  CategoryID
-FROM RankedProducts
-WHERE rn = 1;
+INSERT INTO dev.dbo.Category (Level1Category)
+SELECT DISTINCT Level1Category
+FROM dev.stg.RawOrder
+WHERE Level1Category IS NOT NULL;
