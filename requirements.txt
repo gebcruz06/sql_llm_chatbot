@@ -1,4 +1,3 @@
 langchain_google_genai
 langchain_community
 dotenv
-pyodbc
