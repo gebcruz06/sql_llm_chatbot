@@ -58,12 +58,23 @@ def generate_sql(llm, question: str, schema: str) -> str:
     Database Schema:
     {schema}
 
-    Rules:
-    - Use ONLY tables/columns from the schema above
-    - Use SQL Server syntax (TOP, GETDATE(), square brackets)
-    - Only SELECT queries
-    - Qualify column names (table.column)
-    - Return SQL only, no formatting
+    STRICT SQL SERVER RULES - YOU MUST FOLLOW THESE:
+    1. Use ONLY tables/columns from the schema above - DO NOT invent columns
+    2. MANDATORY SQL Server T-SQL syntax:
+       - Use TOP N instead of LIMIT N
+       - Use GETDATE() for current date/time
+       - Use DATEPART(), YEAR(), MONTH(), DAY() for date functions
+       - Use LEN() instead of LENGTH()
+       - Use CHARINDEX() instead of LOCATE()
+       - Use SUBSTRING() with SQL Server syntax
+       - Use ISNULL() instead of COALESCE when possible
+       - Use square brackets [table].[column] for identifiers with spaces/keywords
+    3. Only SELECT queries allowed - NO INSERT/UPDATE/DELETE/DROP/CREATE/ALTER
+    4. Always qualify column names as table.column or [table].[column]
+    5. Use proper SQL Server JOIN syntax
+    6. Use CASE WHEN for conditional logic
+    7. Use GROUP BY with aggregate functions (COUNT, SUM, AVG, MIN, MAX)
+    8. Use ORDER BY for sorting results
 
     SQL:
     """
@@ -89,7 +100,7 @@ def execute_query(db, sql: str, llm, question: str, schema: str, attempt: int = 
         if attempt >= 3:
             return f"Query failed after 3 attempts. Error: {str(e)}"
         
-        print(f"⚠️  Attempt {attempt} failed: {str(e)}")
+        print(f"Attempt {attempt} failed: {str(e)}")
         
         # Generate corrected query
         correction_prompt = f"""
@@ -134,7 +145,7 @@ def ask_question(llm, db, question: str, schema: str):
     return explanation
 
 def main():
-    print("🚀 SQL Chatbot")
+    print("🚀 Launching SQL Chatbot")
 
     # Initialize
     try:
@@ -153,7 +164,9 @@ def main():
         print(f"❌ Setup failed: {e}")
         return
 
-    print("\n💬 Ask questions about your database (Ctrl+C to quit)")
+    print("\n📋 Instructions:")
+    print("  • Ask questions to your database in natural language")
+    print("  • Press Ctrl+C to quit")
 
     while True:
         try:
