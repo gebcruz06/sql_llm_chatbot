@@ -1,3 +1,18 @@
+LLM SQL Chatbot
+A proof-of-concept app to ask a database your data questions in human language.
+The LLM will understand your question, write a SQL query for it, retrieve data, and translate the results back in human language.
+This proof-of-concept uses free open-source components:
+Gemma 3-4B (LLM), MS SQL Server Express 2022 (database), LangChain (framework)
+
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/23fe3b15-77eb-496b-8681-7425f342a53f" />
+
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/8c2e4e71-f959-420e-ae26-1f17580c00a2" />
+
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/c2f5a95b-0305-4103-a219-4d6945bd09b7" />
+
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/4ac723b2-c887-41b9-a2c6-ff38bdca5c33" />
+
+
 # SQL Chatbot Application Flow
 
 This flowchart shows the complete workflow of the SQL chatbot application, from initialization to user interaction and query processing.
@@ -98,9 +113,3 @@ flowchart TD
 - **Orange**: Decision points and conditionals
 - **Red**: Error handling and failures
 - **Green**: Success states and confirmations
-
-## Usage
-1. Copy this entire markdown content
-2. Create a new `.md` file in your GitHub repository (e.g., `FLOWCHART.md` or add to `README.md`)
-3. Paste the content
-4. Commit and push - GitHub will automatically render the Mermaid diagram!
