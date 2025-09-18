@@ -6,12 +6,9 @@ Gemma 3-4B (LLM), MS SQL Server Express 2022 (database), LangChain (framework)
 
 <img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/23fe3b15-77eb-496b-8681-7425f342a53f" />
 
-<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/8c2e4e71-f959-420e-ae26-1f17580c00a2" />
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/4e86947b-1516-44bb-abf9-feb93bbd9f3a" />
 
 <img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/c2f5a95b-0305-4103-a219-4d6945bd09b7" />
-
-<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/4ac723b2-c887-41b9-a2c6-ff38bdca5c33" />
-
 
 # SQL Chatbot Application Flow
 
