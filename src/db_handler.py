@@ -1,4 +1,5 @@
 import os
+import re
 import urllib.parse
 from langchain_community.utilities import SQLDatabase
 
@@ -21,11 +22,38 @@ def create_connection_string():
     )
 
 
+def sanitize_sql(sql: str) -> str:
+    """Sanitize SQL input to prevent injection attacks"""
+    if not sql or not isinstance(sql, str):
+        raise ValueError("Invalid SQL input")
+    
+    sql = sql.strip()
+    if not sql.upper().startswith("SELECT"):
+        raise ValueError("Only SELECT statements allowed")
+    
+    # Block dangerous patterns
+    forbidden = [
+        r'\b(INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|TRUNCATE|EXEC|EXECUTE|SP_|XP_)\b',
+        r';\s*\w',  # Stacked queries (semicolon followed by another statement)
+        r'\bUNION\b.*\bSELECT\b',
+        r'\b(OPENROWSET|OPENDATASOURCE|BULK)\b'
+    ]
+    
+    sql_upper = sql.upper()
+    for pattern in forbidden:
+        if re.search(pattern, sql_upper):
+            raise ValueError(f"Forbidden SQL pattern: {pattern}")
+    
+    if len(sql) > 2000:
+        raise ValueError("Query too long")
+    
+    return sql
+
+
 def get_schema_info(db: SQLDatabase) -> str:
     """Get comprehensive schema info with foreign keys"""
     schema = db.get_table_info()
     
-    # Add foreign key relationships
     try:
         fk_query = """
         SELECT 
@@ -44,18 +72,20 @@ def get_schema_info(db: SQLDatabase) -> str:
         if fk_result:
             schema += f"\n\nForeign Key Relationships:\n{fk_result}"
     except:
-        pass  # Skip if foreign key query fails
+        pass
     
     return schema
 
 
 def execute_query(db, sql: str, llm, question: str, schema: str, sql_rules: str, attempt: int = 1):
-    """Execute query with retry on error"""
-    if not sql.upper().startswith("SELECT"):
-        return "Only SELECT queries allowed"
+    """Execute query with sanitization and retry on error"""
+    try:
+        safe_sql = sanitize_sql(sql)
+    except ValueError as e:
+        return f"Security validation failed: {str(e)}"
     
     try:
-        result = db.run(sql)
+        result = db.run(safe_sql)
         return result if result else "Query executed but returned no rows."
     except Exception as e:
         if attempt >= 3:
@@ -63,9 +93,8 @@ def execute_query(db, sql: str, llm, question: str, schema: str, sql_rules: str,
         
         print(f"Attempt {attempt} failed: {str(e)}")
         
-        # Generate corrected query with the same rules
         correction_prompt = f"""
-        This SQL query failed: {sql}
+        This SQL query failed: {safe_sql}
         Error: {str(e)}
         
         Fix the query for this question: "{question}"
